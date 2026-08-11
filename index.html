@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>講師推介名單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDEAE2; --paper-2:#E3DFD3; --ink:#211F1C; --ink-soft:#5B564C;
+    --seal:#B23A2E; --stamp-green:#455C4E; --gold:#B8952E; --line:#CFC9BA; --card:#F6F4EE;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+    line-height:1.7;
+  }
+  .wrap{max-width:1000px; margin:0 auto; padding:48px 24px 100px;}
+
+  header{margin-bottom:28px;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em;
+    color:var(--stamp-green); text-transform:uppercase; margin-bottom:12px;
+  }
+  .eyebrow span{border:1px solid var(--line); padding:1px 8px; border-radius:2px; background:var(--card);}
+  h1{font-family:'Noto Serif TC',serif; font-weight:900; font-size:clamp(28px,4.5vw,40px); margin:0 0 10px;}
+  .subtitle{color:var(--ink-soft); font-size:15px; max-width:60ch;}
+
+  .actionbar{display:flex; justify-content:flex-end; gap:10px; margin:20px 0;}
+  .btn{
+    font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    background:var(--ink); color:#fff; border:none; padding:9px 16px;
+    border-radius:4px; cursor:pointer;
+  }
+  .btn:hover{background:var(--seal);}
+
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px; padding-top:16px; border-top:1px solid var(--line);}
+  .chip{
+    font-size:13px; padding:5px 13px; border-radius:999px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink-soft); cursor:pointer;
+  }
+  .chip.active{background:var(--stamp-green); border-color:var(--stamp-green); color:#F6F4EE;}
+
+  /* 講師名冊（目錄） */
+  #directory{margin-bottom:8px;}
+  .dir-entry{padding:16px 0; border-bottom:1px solid var(--line);}
+  .dir-entry:first-child{padding-top:0;}
+  .dir-name{
+    font-family:'Noto Serif TC',serif; font-weight:900; font-size:19px;
+    color:var(--ink); border-bottom:2px solid var(--gold); display:inline-block;
+  }
+  .dir-loc{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .dir-loc b{color:var(--ink); font-weight:700;}
+  .dir-role{font-size:13.5px; color:var(--ink-soft); margin-top:6px;}
+  .dir-tags{margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;}
+  .tag{
+    font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--stamp-green);
+    border:1px solid var(--stamp-green); border-radius:3px; padding:1px 7px;
+  }
+  .dir-audience{font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+  .dir-audience b{color:var(--ink); font-weight:700;}
+  .dir-fee{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .dir-fee b{color:var(--ink); font-weight:700;}
+  .dir-courses{margin-top:8px; padding-left:0; list-style:none;}
+  .dir-courses li{font-size:13.5px; margin-bottom:3px;}
+  .dir-courses a{color:var(--seal); text-decoration:none; border-bottom:1px dotted var(--seal);}
+  .dir-courses .dur{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); margin-left:4px;}
+
+  /* 課程大綱資料卡 */
+  .grid-section{margin-top:36px;}
+  .section-label{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:.1em;
+    color:var(--stamp-green); text-transform:uppercase; margin-bottom:14px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .back-top{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:700;
+    color:var(--seal); text-decoration:none; padding:3px 10px;
+    border:1px solid var(--seal); border-radius:4px;
+  }
+  .course-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;}
+  .course-card{
+    background:var(--card); border:1px solid var(--line); border-radius:6px; padding:16px;
+    scroll-margin-top:20px;
+  }
+  .cc-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:6px;}
+  .cc-name{
+    font-family:'Noto Serif TC',serif; font-weight:900; font-size:14px;
+    color:var(--ink); border-bottom:2px solid var(--gold);
+  }
+  .cc-duration{
+    flex:none; font-family:'JetBrains Mono',monospace; font-size:10.5px;
+    color:#fff; background:var(--stamp-green); padding:2px 7px; border-radius:3px; white-space:nowrap;
+  }
+  .cc-title{font-family:'Noto Serif TC',serif; font-weight:700; font-size:15px; margin-bottom:10px; line-height:1.4;}
+  .cc-syllabus{list-style:none; margin:0 0 10px; padding:0; border-top:1px solid var(--line);}
+  .cc-syllabus li{display:flex; gap:10px; padding:6px 0; border-bottom:1px solid var(--line); font-size:12.5px;}
+  .cc-time{flex:none; width:80px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft);}
+  .cc-syllabus li.qa .cc-content{color:var(--ink-soft); font-style:italic;}
+  .cc-outcomes{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);}
+  .cc-outcomes-label{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.05em;
+    color:var(--stamp-green); text-transform:uppercase; margin-bottom:5px;
+  }
+  .cc-outcomes ul{margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft);}
+
+  footer{
+    margin-top:48px; padding-top:16px; border-top:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft);
+  }
+
+  .load-msg{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft);}
+  .load-error{color:var(--seal);}
+
+  @page{ margin:14mm 12mm; }
+  @page{ @bottom-center{ content: counter(page) " / " counter(pages); font-family:'JetBrains Mono',monospace; font-size:9px; color:#5B564C; } }
+  @media print{
+    body{background:#fff;}
+    .actionbar, .filters, .back-top{display:none !important;}
+    .wrap{max-width:100%; padding:0;}
+    .course-grid{grid-template-columns:repeat(3,1fr);}
+    .course-card{break-inside:avoid; page-break-inside:avoid;}
+    .grid-section{page-break-before:always; margin-top:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header id="directory-top">
+    <div class="eyebrow"><span>講者推介 · 2026</span></div>
+    <h1>講師推介名單</h1>
+    <div class="subtitle">提供貴校規劃課程／講座大綱時參考使用，可依講題方向篩選，或直接匯出PDF。</div>
+  </header>
+
+  <div class="actionbar"><button type="button" class="btn" id="export-pdf">⭳ 匯出 PDF</button></div>
+
+  <div class="filters" id="filters"></div>
+
+  <div id="directory"><p class="load-msg">名單載入中…</p></div>
+
+  <div class="grid-section">
+    <div class="section-label"><span>課程大綱</span><a class="back-top" href="#directory-top">↑ 回到講師名冊</a></div>
+    <div class="course-grid" id="course-grid"></div>
+  </div>
+
+  <footer>
+    <span id="count-tag"></span> ・ 如需安排時段、進一步詢問或資訊，請直接回覆本信件洽詢
+  </footer>
+</div>
+
+<script>
+  function esc(str){
+    return String(str == null ? '' : str).replace(/[&<>]/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;'}[ch];
+    });
+  }
+
+  var speakers = [];
+  var activeTag = null;
+  var strokeCollator = null;
+  try { strokeCollator = new Intl.Collator('zh-Hant-u-co-stroke'); } catch (e) {}
+
+  function sortedSpeakers(){
+    var arr = speakers.slice();
+    if (strokeCollator){
+      arr.sort(function(a, b){ return strokeCollator.compare(a['姓名'], b['姓名']); });
+    }
+    return arr;
+  }
+
+  function buildFilters(){
+    var filtersEl = document.getElementById('filters');
+    filtersEl.innerHTML = '';
+    var allTags = [];
+    speakers.forEach(function(s){
+      (s['講題方向'] || []).forEach(function(t){
+        if (allTags.indexOf(t) === -1) allTags.push(t);
+      });
+    });
+    allTags.forEach(function(tag){
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip' + (tag === activeTag ? ' active' : '');
+      chip.textContent = tag;
+      chip.addEventListener('click', function(){
+        activeTag = activeTag === tag ? null : tag;
+        render();
+      });
+      filtersEl.appendChild(chip);
+    });
+  }
+
+  function render(){
+    buildFilters();
+    var filtered = sortedSpeakers().filter(function(s){
+      return !activeTag || (s['講題方向'] || []).indexOf(activeTag) !== -1;
+    });
+
+    document.getElementById('count-tag').textContent = '共收錄 ' + speakers.length + ' 位講師';
+
+    var dirEl = document.getElementById('directory');
+    dirEl.innerHTML = filtered.map(function(s, si){
+      var courses = s['課程'] || [];
+      return (
+        '<div class="dir-entry">' +
+        '<span class="dir-name">' + esc(s['姓名']) + '</span>' +
+        '<div class="dir-role">' + esc(s['簡歷']) + '</div>' +
+        '<div class="dir-tags">' + (s['講題方向']||[]).map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join('') + '</div>' +
+        (s['地點'] ? '<div class="dir-loc"><b>可演講地點：</b>' + esc(s['地點']) + '</div>' : '') +
+        (s['適合對象'] ? '<div class="dir-audience"><b>適合對象／系所：</b>' + esc(s['適合對象']) + '</div>' : '') +
+        '<div class="dir-fee"><b>鐘點費：</b>' + esc(s['鐘點費'] || '') + '</div>' +
+        '<ul class="dir-courses">' +
+        courses.map(function(c, ci){
+          return '<li><a href="#card-' + slug(s['姓名']) + '-' + ci + '">〈' + esc(c['課程名稱']) + '〉</a><span class="dur">' + esc(c['時長']) + '</span></li>';
+        }).join('') +
+        '</ul></div>'
+      );
+    }).join('');
+
+    var gridEl = document.getElementById('course-grid');
+    gridEl.innerHTML = filtered.map(function(s){
+      var courses = s['課程'] || [];
+      return courses.map(function(c, ci){
+        var syllabus = c['課綱'] || [];
+        var outcomes = c['學員收穫'] || [];
+        return (
+          '<div class="course-card" id="card-' + slug(s['姓名']) + '-' + ci + '">' +
+          '<div class="cc-head"><span class="cc-name">' + esc(s['姓名']) + '</span><span class="cc-duration">' + esc(c['時長']) + '</span></div>' +
+          '<div class="cc-title">〈' + esc(c['課程名稱']) + '〉</div>' +
+          '<ul class="cc-syllabus">' +
+          syllabus.map(function(row){
+            var cls = row['類型'] === 'qa' ? 'qa' : '';
+            return '<li class="' + cls + '"><span class="cc-time">' + esc(row['時間']) + '</span><span class="cc-content">' + esc(row['內容']) + '</span></li>';
+          }).join('') +
+          '</ul>' +
+          (outcomes.length ? '<div class="cc-outcomes"><div class="cc-outcomes-label">學員收穫</div><ul>' + outcomes.map(function(o){ return '<li>'+esc(o)+'</li>'; }).join('') + '</ul></div>' : '') +
+          '</div>'
+        );
+      }).join('');
+    }).join('');
+  }
+
+  function slug(name){
+    return encodeURIComponent(name);
+  }
+
+  document.getElementById('export-pdf').addEventListener('click', function(){
+    window.print();
+  });
+
+  fetch('data/speakers.json')
+    .then(function(res){
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function(data){
+      speakers = Array.isArray(data) ? data : [];
+      render();
+    })
+    .catch(function(err){
+      document.getElementById('directory').innerHTML =
+        '<p class="load-msg load-error">名單載入失敗（' + esc(err.message) + '）。' +
+        '若你是直接在電腦上用瀏覽器打開這個檔案，部分瀏覽器會擋掉本機讀取JSON的動作；' +
+        '請改用本機伺服器測試，或直接上傳到GitHub Pages後用網址開啟即可正常運作。</p>';
+    });
+</script>
+</body>
+</html>
