@@ -54,6 +54,10 @@
   }
   .dir-loc{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
   .dir-loc b{color:var(--ink); font-weight:700;}
+  .dir-visited{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .dir-visited b{color:var(--ink); font-weight:700;}
+  .dir-praise{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .dir-praise b{color:var(--ink); font-weight:700;}
   .dir-role{font-size:13.5px; color:var(--ink-soft); margin-top:6px;}
   .dir-tags{margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;}
   .tag{
@@ -165,9 +169,13 @@
 
   function sortedSpeakers(){
     var arr = speakers.slice();
-    if (strokeCollator){
-      arr.sort(function(a, b){ return strokeCollator.compare(a['姓名'], b['姓名']); });
-    }
+    arr.sort(function(a, b){
+      var oa = (typeof a['排序'] === 'number') ? a['排序'] : Infinity;
+      var ob = (typeof b['排序'] === 'number') ? b['排序'] : Infinity;
+      if (oa !== ob) return oa - ob;
+      if (strokeCollator) return strokeCollator.compare(a['姓名'], b['姓名']);
+      return 0;
+    });
     return arr;
   }
 
@@ -210,8 +218,10 @@
         '<div class="dir-role">' + esc(s['簡歷']) + '</div>' +
         '<div class="dir-tags">' + (s['講題方向']||[]).map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join('') + '</div>' +
         (s['地點'] ? '<div class="dir-loc"><b>可演講地點：</b>' + esc(s['地點']) + '</div>' : '') +
+        (s['曾到訪學校/單位'] ? '<div class="dir-visited"><b>曾到訪學校／單位：</b>' + esc(s['曾到訪學校/單位']) + '</div>' : '') +
+        (s['好評紀錄'] ? '<div class="dir-praise"><b>好評紀錄：</b>' + esc(s['好評紀錄']) + '</div>' : '') +
         (s['適合對象'] ? '<div class="dir-audience"><b>適合對象／系所：</b>' + esc(s['適合對象']) + '</div>' : '') +
-        '<div class="dir-fee"><b>鐘點費：</b>' + esc(s['鐘點費'] || '') + '</div>' +
+        (s['鐘點費'] ? '<div class="dir-fee"><b>鐘點費：</b>' + esc(s['鐘點費']) + '</div>' : '') +
         '<ul class="dir-courses">' +
         courses.map(function(c, ci){
           return '<li><a href="#card-' + slug(s['姓名']) + '-' + ci + '">〈' + esc(c['課程名稱']) + '〉</a><span class="dur">' + esc(c['時長']) + '</span></li>';
