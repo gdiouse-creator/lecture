@@ -261,7 +261,7 @@
     window.print();
   });
 
-  fetch('data/speakers.json')
+  fetch('data/speakers.json?t=' + Date.now(), { cache: 'no-store' })
     .then(function(res){
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
