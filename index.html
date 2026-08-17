@@ -8,8 +8,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#EDEAE2; --paper-2:#E3DFD3; --ink:#211F1C; --ink-soft:#5B564C;
-    --seal:#B23A2E; --stamp-green:#455C4E; --gold:#B8952E; --line:#CFC9BA; --card:#F6F4EE;
+    --paper:#FAF6EE; --paper-2:#F2ECDD; --ink:#3B332B; --ink-soft:#6B5F52;
+    --seal:#E8A93B; --accent-ink:#8A5A16; --stamp-green:#5F7A56; --gold:#F3D27E; --line:#E3D5BE; --card:#FFFDF8;
+    --texture-dot:rgba(107,95,82,.13);
+    --badge-text:#FFFDF8;
+  }
+  html[data-theme="b"]{
+    /* 暖陽野餐 */
+    --paper:#FBF1E4; --paper-2:#F5E4D2; --ink:#4A3728; --ink-soft:#7A6552;
+    --seal:#E0637A; --accent-ink:#A83354; --stamp-green:#2E6F65; --gold:#F7C9C7; --line:#EAD3BE; --card:#FFFAF2;
+    --texture-dot:rgba(168,51,84,.10);
+    --badge-text:#FFFAF2;
+  }
+  html[data-theme="c"]{
+    /* 手作紙膠帶 */
+    --paper:#E9DCC3; --paper-2:#DFCFAE; --ink:#33424F; --ink-soft:#66727C;
+    --seal:#D4A24C; --accent-ink:#7A5518; --stamp-green:#366B66; --gold:#F0D48A; --line:#D5C39F; --card:#F7F0E2;
+    --texture-dot:rgba(51,66,79,.14);
+    --badge-text:#F7F0E2;
+    --washi-1:#B98A5E; --washi-2:#6E8F87; --washi-3:#9A6B85;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -17,7 +34,18 @@
     background:var(--paper); color:var(--ink);
     font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
     line-height:1.7;
+    position:relative;
+    transition:background .25s ease, color .25s ease;
   }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image: radial-gradient(circle, var(--texture-dot) 1.3px, transparent 1.5px);
+    background-size: 20px 20px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrap{position:relative; z-index:1;}
   .wrap{max-width:1000px; margin:0 auto; padding:48px 24px 100px;}
 
   header{margin-bottom:28px;}
@@ -35,14 +63,14 @@
     background:var(--ink); color:#fff; border:none; padding:9px 16px;
     border-radius:4px; cursor:pointer;
   }
-  .btn:hover{background:var(--seal);}
+  .btn:hover{background:var(--seal); color:var(--ink);}
 
   .filters{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px; padding-top:16px; border-top:1px solid var(--line);}
   .chip{
     font-size:13px; padding:5px 13px; border-radius:999px;
     border:1px solid var(--line); background:var(--card); color:var(--ink-soft); cursor:pointer;
   }
-  .chip.active{background:var(--stamp-green); border-color:var(--stamp-green); color:#F6F4EE;}
+  .chip.active{background:var(--stamp-green); border-color:var(--stamp-green); color:var(--badge-text);}
 
   /* 講師名冊（目錄） */
   #directory{margin-bottom:8px;}
@@ -50,7 +78,9 @@
   .dir-entry:first-child{padding-top:0;}
   .dir-name{
     font-family:'Noto Serif TC',serif; font-weight:900; font-size:19px;
-    color:var(--ink); border-bottom:2px solid var(--gold); display:inline-block;
+    color:var(--ink); display:inline;
+    background-image:linear-gradient(transparent 62%, var(--gold) 62%);
+    padding:0 2px;
   }
   .dir-loc{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
   .dir-loc b{color:var(--ink); font-weight:700;}
@@ -70,7 +100,7 @@
   .dir-fee b{color:var(--ink); font-weight:700;}
   .dir-courses{margin-top:8px; padding-left:0; list-style:none;}
   .dir-courses li{font-size:13.5px; margin-bottom:3px;}
-  .dir-courses a{color:var(--seal); text-decoration:none; border-bottom:1px dotted var(--seal);}
+  .dir-courses a{color:var(--accent-ink); text-decoration:none; border-bottom:1px dotted var(--accent-ink);}
   .dir-courses .dur{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); margin-left:4px;}
 
   /* 課程大綱資料卡 */
@@ -82,22 +112,27 @@
   }
   .back-top{
     font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:700;
-    color:var(--seal); text-decoration:none; padding:3px 10px;
-    border:1px solid var(--seal); border-radius:4px;
+    color:var(--accent-ink); text-decoration:none; padding:3px 10px;
+    border:1px solid var(--accent-ink); border-radius:4px;
   }
   .course-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;}
   .course-card{
     background:var(--card); border:1px solid var(--line); border-radius:6px; padding:16px;
     scroll-margin-top:20px;
   }
+  html[data-theme="c"] .course-card{border-top:5px solid var(--washi-1);}
+  html[data-theme="c"] .course-card:nth-of-type(3n+2){border-top-color:var(--washi-2);}
+  html[data-theme="c"] .course-card:nth-of-type(3n){border-top-color:var(--washi-3);}
   .cc-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:6px;}
   .cc-name{
     font-family:'Noto Serif TC',serif; font-weight:900; font-size:14px;
-    color:var(--ink); border-bottom:2px solid var(--gold);
+    color:var(--ink);
+    background-image:linear-gradient(transparent 60%, var(--gold) 60%);
+    padding:0 1px;
   }
   .cc-duration{
     flex:none; font-family:'JetBrains Mono',monospace; font-size:10.5px;
-    color:#fff; background:var(--stamp-green); padding:2px 7px; border-radius:3px; white-space:nowrap;
+    color:var(--badge-text); background:var(--stamp-green); padding:2px 7px; border-radius:3px; white-space:nowrap; font-weight:700;
   }
   .cc-title{font-family:'Noto Serif TC',serif; font-weight:700; font-size:15px; margin-bottom:10px; line-height:1.4;}
   .cc-syllabus{list-style:none; margin:0 0 10px; padding:0; border-top:1px solid var(--line);}
@@ -116,14 +151,34 @@
     font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft);
   }
 
+  .theme-switcher{
+    margin-top:20px; padding-top:16px; border-top:1px dashed var(--line);
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  }
+  .theme-label{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft);
+    margin-right:2px;
+  }
+  .theme-btn{
+    font-family:'Noto Sans TC',sans-serif; font-size:12.5px;
+    padding:6px 14px; border-radius:999px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+    cursor:pointer; transition:all .15s ease;
+  }
+  .theme-btn:hover{border-color:var(--stamp-green); color:var(--ink);}
+  .theme-btn.active{
+    background:var(--stamp-green); border-color:var(--stamp-green); color:var(--badge-text);
+    font-weight:700;
+  }
+
   .load-msg{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft);}
-  .load-error{color:var(--seal);}
+  .load-error{color:var(--accent-ink);}
 
   @page{ margin:14mm 12mm; }
-  @page{ @bottom-center{ content: counter(page) " / " counter(pages); font-family:'JetBrains Mono',monospace; font-size:9px; color:#5B564C; } }
+  @page{ @bottom-center{ content: counter(page) " / " counter(pages); font-family:'JetBrains Mono',monospace; font-size:9px; color:#6B5F52; } }
   @media print{
     body{background:#fff;}
-    .actionbar, .filters, .back-top{display:none !important;}
+    .actionbar, .filters, .back-top, .theme-switcher{display:none !important;}
     .wrap{max-width:100%; padding:0;}
     .course-grid{grid-template-columns:repeat(3,1fr);}
     .course-card{break-inside:avoid; page-break-inside:avoid;}
@@ -153,7 +208,24 @@
   <footer>
     <span id="count-tag"></span> ・ 如需安排時段、進一步詢問或資訊，請直接回覆本信件洽詢
   </footer>
+
+  <div class="theme-switcher">
+    <span class="theme-label">配色風格</span>
+    <button type="button" class="theme-btn" data-theme-choice="a">教室手記</button>
+    <button type="button" class="theme-btn" data-theme-choice="b">暖陽野餐</button>
+    <button type="button" class="theme-btn" data-theme-choice="c">手作紙膠帶</button>
+  </div>
 </div>
+
+<script>
+  var THEME_KEY = 'ld-theme';
+  (function initTheme(){
+    var saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    var theme = saved || 'a';
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
 
 <script>
   function esc(str){
@@ -259,6 +331,22 @@
 
   document.getElementById('export-pdf').addEventListener('click', function(){
     window.print();
+  });
+
+  function setActiveThemeButton(theme){
+    Array.prototype.forEach.call(document.querySelectorAll('.theme-btn'), function(btn){
+      btn.classList.toggle('active', btn.dataset.themeChoice === theme);
+    });
+  }
+  setActiveThemeButton(document.documentElement.getAttribute('data-theme') || 'a');
+
+  Array.prototype.forEach.call(document.querySelectorAll('.theme-btn'), function(btn){
+    btn.addEventListener('click', function(){
+      var theme = btn.dataset.themeChoice;
+      document.documentElement.setAttribute('data-theme', theme);
+      setActiveThemeButton(theme);
+      try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    });
   });
 
   fetch('data/speakers.json?t=' + Date.now(), { cache: 'no-store' })
