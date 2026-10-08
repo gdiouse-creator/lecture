@@ -74,7 +74,7 @@
 
   /* 講師名冊（目錄） */
   #directory{margin-bottom:8px;}
-  .dir-entry{padding:16px 0; border-bottom:1px solid var(--line);}
+  .dir-entry{padding:16px 0; border-bottom:1px solid var(--line); scroll-margin-top:20px;}
   .dir-entry:first-child{padding-top:0;}
   .dir-name{
     font-family:'Noto Serif TC',serif; font-weight:900; font-size:19px;
@@ -129,7 +129,9 @@
     color:var(--ink);
     background-image:linear-gradient(transparent 60%, var(--gold) 60%);
     padding:0 1px;
+    text-decoration:none; cursor:pointer;
   }
+  .cc-name:hover{color:var(--accent-ink);}
   .cc-duration{
     flex:none; font-family:'JetBrains Mono',monospace; font-size:10.5px;
     color:var(--badge-text); background:var(--stamp-green); padding:2px 7px; border-radius:3px; white-space:nowrap; font-weight:700;
@@ -285,7 +287,7 @@
     dirEl.innerHTML = filtered.map(function(s, si){
       var courses = s['課程'] || [];
       return (
-        '<div class="dir-entry">' +
+        '<div class="dir-entry" id="dir-' + slug(s['姓名']) + '">' +
         '<span class="dir-name">' + esc(s['姓名']) + '</span>' +
         '<div class="dir-role">' + esc(s['簡歷']) + '</div>' +
         '<div class="dir-tags">' + (s['講題方向']||[]).map(function(t){ return '<span class="tag">'+esc(t)+'</span>'; }).join('') + '</div>' +
@@ -310,7 +312,7 @@
         var outcomes = c['學員收穫'] || [];
         return (
           '<div class="course-card" id="card-' + slug(s['姓名']) + '-' + ci + '">' +
-          '<div class="cc-head"><span class="cc-name">' + esc(s['姓名']) + '</span><span class="cc-duration">' + esc(c['時長']) + '</span></div>' +
+          '<div class="cc-head"><a class="cc-name" href="#dir-' + slug(s['姓名']) + '">' + esc(s['姓名']) + '</a><span class="cc-duration">' + esc(c['時長']) + '</span></div>' +
           '<div class="cc-title">〈' + esc(c['課程名稱']) + '〉</div>' +
           '<ul class="cc-syllabus">' +
           syllabus.map(function(row){
